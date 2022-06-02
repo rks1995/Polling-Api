@@ -2,9 +2,21 @@ const express = require('express');
 
 const router = express();
 
-router.post('/questions/create', (req, res) => {
-  console.log(req.body);
-  res.status(201).json({ message: 'question successfully created!' });
-});
+//controllers
+const {
+  createQuestion,
+  addOptions,
+  addVote,
+  deleteQuestion,
+  deleteOption,
+  viewQuestion,
+} = require('../controller');
+
+router.route('/questions/:id').get(viewQuestion);
+router.route('/questions/create').post(createQuestion);
+router.route('/questions/:id/options/create').post(addOptions);
+router.route('/options/:id/add_vote').patch(addVote);
+router.route('/questions/:id/delete').delete(deleteQuestion);
+router.route('/options/:id/delete').delete(deleteOption);
 
 module.exports = router;
