@@ -1,4 +1,5 @@
 const Questions = require('../model/questions');
+const { StatusCodes } = require('http-status-codes');
 
 const viewQuestion = (req, res) => {
   console.log(req.body);
@@ -13,7 +14,7 @@ const createQuestion = async (req, res) => {
       question: newQuestion,
     });
   } catch (error) {
-    res.status(400).json({ message: 'Bad Request' });
+    res.status(StatusCodes.BAD_REQUEST).json({ message: 'Bad Request' });
   }
 };
 
