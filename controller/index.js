@@ -1,15 +1,28 @@
+const Questions = require('../model/questions');
+
 const viewQuestion = (req, res) => {
   console.log(req.body);
   res.status(200).json({ message: 'This is your question' });
 };
 
-const createQuestion = (req, res) => {
-  console.log(req.body);
-  res.status(201).json({ message: 'question successfully created!' });
+const createQuestion = async (req, res) => {
+  try {
+    const newQuestion = await Questions.create(req.body);
+    res.status(201).json({
+      message: 'question successfully created!',
+      question: newQuestion,
+    });
+  } catch (error) {
+    res.status(400).json({ message: 'Bad Request' });
+  }
 };
 
-const addOptions = (req, res) => {
-  res.status(201).json({ message: 'options added successfully' });
+const addOptions = async (req, res) => {
+  try {
+    res.status(201).json({ message: 'options added successfully' });
+  } catch (error) {
+    res.status(400).json({ message: 'Bad Request' });
+  }
 };
 
 const addVote = (req, res) => {
