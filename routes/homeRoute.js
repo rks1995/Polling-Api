@@ -4,6 +4,7 @@ const router = express();
 
 //controllers
 const {
+  getAllQuestions,
   createQuestion,
   addOptions,
   addVote,
@@ -12,6 +13,7 @@ const {
   viewQuestion,
 } = require('../controller');
 
+router.route('/list/questions').get(getAllQuestions);
 router.route('/questions/:id').get(viewQuestion);
 router.route('/questions/create').post(createQuestion);
 router.route('/questions/:id/options/create').post(addOptions);

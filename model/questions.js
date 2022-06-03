@@ -1,4 +1,6 @@
+const { ObjectID } = require('bson');
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const questionsSchema = new mongoose.Schema(
   {
@@ -7,22 +9,7 @@ const questionsSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    options: [
-      {
-        text: {
-          type: String,
-          unique: true,
-          required: true,
-        },
-        votes: {
-          type: Number,
-          default: 0,
-        },
-        link: {
-          type: String,
-        },
-      },
-    ],
+    options: [{}],
   },
   { timestamps: true }
 );
