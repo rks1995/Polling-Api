@@ -9,7 +9,6 @@ const optionsSchema = new mongoose.Schema(
 
     text: {
       type: String,
-      unique: true,
       required: true,
     },
     votes: {

@@ -31,7 +31,6 @@ const createQuestion = async (req, res) => {
 
 const addOptions = async (req, res) => {
   const { id } = req.params;
-  console.log(req.body);
   try {
     //find the question
     const question = await Questions.findById(id);
@@ -82,7 +81,7 @@ const deleteQuestion = async (req, res) => {
     }
 
     // step2 delete all the options related to the question from options model
-    if (question.options.length > 1) {
+    if (question.options.length > 0) {
       await Options.deleteMany({ question: new ObjectId(req.params.id) });
     }
 
@@ -92,8 +91,32 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
-const deleteOption = (req, res) => {
-  res.status(200).json({ message: 'options deleted successfully' });
+const deleteOption = async (req, res) => {
+  console.log(req.params.id);
+  try {
+    const option = await Options.findByIdAndDelete(req.params.id);
+
+    if (!option) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Option not found!' });
+    }
+
+    const questionId = option.question.toString();
+
+    //grab the question and pull out the option from that question
+    const question = await Questions.findById(questionId);
+
+    const newOptions = question.options.filter((item) => {
+      return item._id.toString() !== req.params.id;
+    });
+
+    question.options = newOptions;
+    question.save();
+    res.status(200).json({ message: 'options deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ message: 'Bad Request' });
+  }
 };
 
 module.exports = {

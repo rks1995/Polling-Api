@@ -6,7 +6,6 @@ const app = express();
 const homeRoute = require('./routes/homeRoute');
 const connectDB = require('./db/config');
 const pageNotFound = require('./error/pageNotFound');
-const { stat } = require('fs');
 
 // parse json data from body
 app.use(express.json());
