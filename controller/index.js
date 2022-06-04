@@ -1,6 +1,7 @@
 const Questions = require('../model/questions');
 const Options = require('../model/options');
 const { StatusCodes } = require('http-status-codes');
+const { ObjectId } = require('bson');
 
 const getAllQuestions = async (req, res) => {
   try {
@@ -40,7 +41,10 @@ const addOptions = async (req, res) => {
         .json({ message: 'Bad Request' });
     }
     //find the options
-    const option = await Options.findOne({ text: req.body.text });
+    const option = await Options.findOne({
+      question: new ObjectId(id),
+      text: req.body.text,
+    });
     if (option) {
       return res
         .status(StatusCodes.FORBIDDEN)
@@ -66,8 +70,26 @@ const addVote = (req, res) => {
   res.status(201).json({ message: 'vote added successfully' });
 };
 
-const deleteQuestion = (req, res) => {
-  res.status(200).json({ message: 'question deleted successfully' });
+const deleteQuestion = async (req, res) => {
+  try {
+    //step1 find the question & delete the question from question model
+    const question = await Questions.findByIdAndDelete(req.params.id);
+
+    if (!question) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Question not found!' });
+    }
+
+    // step2 delete all the options related to the question from options model
+    if (question.options.length > 1) {
+      await Options.deleteMany({ question: new ObjectId(req.params.id) });
+    }
+
+    res.status(200).json({ message: 'question deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ message: 'Bad Request' });
+  }
 };
 
 const deleteOption = (req, res) => {

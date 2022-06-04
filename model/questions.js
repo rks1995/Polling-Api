@@ -1,6 +1,4 @@
-const { ObjectID } = require('bson');
 const mongoose = require('mongoose');
-const { type } = require('os');
 
 const questionsSchema = new mongoose.Schema(
   {
