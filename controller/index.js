@@ -15,9 +15,18 @@ const getAllQuestions = async (req, res) => {
 };
 
 // ============================== view Question ===========================//
-const viewQuestion = (req, res) => {
-  console.log(req.body);
-  res.status(200).json({ message: 'This is your question' });
+const viewQuestion = async (req, res) => {
+  try {
+    const question = await Questions.findById(req.params.id);
+    if (!question) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Question not found!' });
+    }
+    res.status(200).json({ message: 'Success', question: question });
+  } catch (error) {
+    res.status(StatusCodes.BAD_GATEWAY).json({ message: 'Bad Gateway' });
+  }
 };
 
 // ============================== Create Questions ===========================//
