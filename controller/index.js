@@ -2,7 +2,9 @@ const Questions = require('../model/questions');
 const Options = require('../model/options');
 const { StatusCodes } = require('http-status-codes');
 const { ObjectId } = require('bson');
+const { default: mongoose } = require('mongoose');
 
+// ============================== get All Questions ===========================//
 const getAllQuestions = async (req, res) => {
   try {
     const questions = await Questions.find({});
@@ -12,11 +14,13 @@ const getAllQuestions = async (req, res) => {
   }
 };
 
+// ============================== view Question ===========================//
 const viewQuestion = (req, res) => {
   console.log(req.body);
   res.status(200).json({ message: 'This is your question' });
 };
 
+// ============================== Create Questions ===========================//
 const createQuestion = async (req, res) => {
   try {
     const newQuestion = await Questions.create(req.body);
@@ -29,6 +33,7 @@ const createQuestion = async (req, res) => {
   }
 };
 
+// ============================== add options ===========================//
 const addOptions = async (req, res) => {
   const { id } = req.params;
   try {
@@ -50,12 +55,13 @@ const addOptions = async (req, res) => {
         .json({ message: 'options already present' });
     }
     //create options
+    let _id = new mongoose.Types.ObjectId().toHexString();
     let newOption = await Options.create({
+      _id: _id,
       question: id,
       text: req.body.text,
+      link: `http://localhost:5000/options/${_id}/add_vote`,
     });
-
-    newOption.link = `http://localhost:5000/options/${newOption.id}/add_vote`;
 
     question.options.push(newOption);
     question.save();
@@ -65,10 +71,43 @@ const addOptions = async (req, res) => {
   }
 };
 
-const addVote = (req, res) => {
-  res.status(201).json({ message: 'vote added successfully' });
+// ============================== add vote ===========================//
+const addVote = async (req, res) => {
+  try {
+    const option = await Options.findById(req.params.id);
+    if (!option) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Option not found!' });
+    }
+    const { votes, question } = option;
+    await Options.findByIdAndUpdate(
+      req.params.id,
+      { votes: votes + 1 },
+      {
+        new: true,
+      }
+    );
+
+    const questionId = question.toString();
+
+    // update the option in that particular question
+    const que = await Questions.findById(questionId);
+
+    que.options.forEach((item) => {
+      if (item._id.toString() === req.params.id) {
+        console.log(item);
+        item.votes += 1;
+      }
+    });
+    que.save();
+    res.status(201).json({ message: 'vote added successfully' });
+  } catch (error) {
+    res.status(400).json({ message: 'Bad Request' });
+  }
 };
 
+// ============================== delete Question ===========================//
 const deleteQuestion = async (req, res) => {
   try {
     //step1 find the question & delete the question from question model
@@ -91,8 +130,8 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
+// ============================== delete option ===========================//
 const deleteOption = async (req, res) => {
-  console.log(req.params.id);
   try {
     const option = await Options.findByIdAndDelete(req.params.id);
 
