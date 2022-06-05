@@ -81,7 +81,7 @@ const addVote = async (req, res) => {
         .json({ message: 'Option not found!' });
     }
     const { votes, question } = option;
-    await Options.findByIdAndUpdate(
+    const updateOption = await Options.findByIdAndUpdate(
       req.params.id,
       { votes: votes + 1 },
       {
@@ -93,13 +93,10 @@ const addVote = async (req, res) => {
 
     // update the option in that particular question
     const que = await Questions.findById(questionId);
-
-    que.options.forEach((item) => {
-      if (item._id.toString() === req.params.id) {
-        console.log(item);
-        item.votes += 1;
-      }
-    });
+    const optIndex = que.options.findIndex(
+      (item) => item._id.toString() === req.params.id
+    );
+    que.options[optIndex] = updateOption;
     que.save();
     res.status(201).json({ message: 'vote added successfully' });
   } catch (error) {
