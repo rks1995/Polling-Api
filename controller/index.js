@@ -8,7 +8,19 @@ const { default: mongoose } = require('mongoose');
 const getAllQuestions = async (req, res) => {
   try {
     const questions = await Questions.find({});
-    res.status(StatusCodes.OK).json({ questions: questions });
+    res
+      .status(StatusCodes.OK)
+      .json({ size: questions.length, questions: questions });
+  } catch (error) {
+    res.status(StatusCodes.BAD_GATEWAY).json({ message: 'Bad Gateway' });
+  }
+};
+
+// ============================== get All options ===========================//
+const getAllOptions = async (req, res) => {
+  try {
+    const options = await Options.find({});
+    res.status(StatusCodes.OK).json({ size: options.length, options: options });
   } catch (error) {
     res.status(StatusCodes.BAD_GATEWAY).json({ message: 'Bad Gateway' });
   }
@@ -163,6 +175,7 @@ const deleteOption = async (req, res) => {
 
 module.exports = {
   getAllQuestions,
+  getAllOptions,
   createQuestion,
   addOptions,
   addVote,
