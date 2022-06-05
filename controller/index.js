@@ -144,13 +144,10 @@ const deleteOption = async (req, res) => {
     const questionId = option.question.toString();
 
     //grab the question and pull out the option from that question
-    const question = await Questions.findById(questionId);
-
-    const newOptions = question.options.filter((item) => {
-      return item._id.toString() !== req.params.id;
+    const question = await Questions.findByIdAndUpdate(questionId, {
+      $pull: { options: option },
     });
 
-    question.options = newOptions;
     question.save();
     res.status(200).json({ message: 'options deleted successfully' });
   } catch (error) {
