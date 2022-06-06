@@ -14,6 +14,12 @@ user can make a vote to an option.
 3.use npm install and npm start
 4.use postman
 
+## Tech Used
+1. Nodejs
+2. Express
+3. MongoAtlas
+4. PostMan
+
 ## Routes and features
 
 url -> http://localhost/5000/
